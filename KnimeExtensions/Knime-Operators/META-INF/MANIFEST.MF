@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Actian Services XPath Operator
+Bundle-SymbolicName: com.actian.services.knime.xpath.operators;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Actian
+Eclipse-RegisterBuddy: com.pervasive.datarush.core.runtime
+Bundle-Activator: com.actian.services.knime.xpath.Activator
+Require-Bundle: 
+ org.eclipse.osgi,
+ com.pervasive.datarush.core.runtime,
+ com.pervasive.datarush.knime.core.runtime;resolution:=optional,
+ com.pervasive.datarush.knime.core.ui;resolution:=optional,
+ com.pervasive.datarush.knime.base.ui;resolution:=optional
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,target/lib/xpath-dataflow.jar

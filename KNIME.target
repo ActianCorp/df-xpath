@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+   Copyright 2015 Actian Corporation
+ 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+ 
+     http://www.apache.org/licenses/LICENSE-2.0
+ 
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ -->
+<?pde version="3.8"?><target name="KNIME 2.11 TP" sequenceNumber="19">
+<locations>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+<unit id="org.knime.features.base.feature.group" version="2.11.3.0046668"/>
+<repository location="http://www.knime.org/update/2.11"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+<unit id="com.actian.dataflow.feature.feature.group" version="6.5.2.112"/>
+<repository location="http://dataflowrepo.actian.com/latest/desktop"/>
+</location>
+</locations>
+<targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+<launcherArgs>
+<vmArgs>-Xmx768m -XX:MaxPermSize=256m -server -Dsun.java2d.d3d=false -Dosgi.classloader.lock=classname -XX:+UnlockDiagnosticVMOptions -XX:+UnsyncloadClass -Dknime.enable.fastload=true -ea -Dorg.eclipse.swt.internal.gtk.cairoGraphics=false -Dorg.eclipse.swt.internal.gtk.useCairo=false -Dorg.eclipse.swt.browser.IEVersion=10001</vmArgs>
+</launcherArgs>
+</target>

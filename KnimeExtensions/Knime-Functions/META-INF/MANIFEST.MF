@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Actian Services XPath Functions
+Bundle-SymbolicName: com.actian.services.knime.xpath.functions;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Actian
+Fragment-Host: com.pervasive.datarush.core.runtime
+Require-Bundle: 
+ org.eclipse.osgi,
+ com.pervasive.datarush.knime.core.runtime;resolution:=optional,
+ com.pervasive.datarush.knime.core.ui;resolution:=optional
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,target/lib/xpath-dataflow.jar

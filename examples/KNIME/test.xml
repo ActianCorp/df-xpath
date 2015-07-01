@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<department>
+    <manager name="Bob">
+        <employee name="Peter"/>
+        <employee name="Paul"/>
+        <employee name="Mary"/>
+    </manager>
+    <manager name="Alice"/>
+    <manager name="Samantha">
+        <employee name="Charles"/>
+    </manager>
+</department>

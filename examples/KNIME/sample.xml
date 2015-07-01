@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- 
+    A skeleton of the expected XML input.
+    This allows the operator to produce a schema at design time and check that the XPath expression
+    is valid.
+ -->
+<department>
+    <manager name="MANAGER_NAME">
+        <employee name="EMPLOYEE_NAME"/>
+    </manager>
+</department>
