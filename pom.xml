@@ -22,6 +22,7 @@
     <packaging>pom</packaging>
     <name>XPath</name>
     <modules>
+        <module>DataflowDependencies</module>
         <module>DataflowExtensions</module>
         <module>KnimeExtensions</module>
     </modules>

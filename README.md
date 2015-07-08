@@ -8,18 +8,10 @@ Before df-xpath tree, you need to have installed the dataflow-p2-site repository
 dataflow.url property to point to the desktop site. (change the /ide suffix to /desktop)
 e.g. http://dataflowrepo.actian.com/latest/desktop
 
-Additionally, ensure that you have the following jars installed into your .m2 repo
-    dataflow-commons.jar
-    dataflow-library.jar
-    dataflow-cluster.jar
-
-This can be accomplished by building an empty project whose pom.xml is similar to
-prerequisite.pom.xml
-
 the following environment variables are setup similar to the following.
 
     export DATAFLOW_REPO_HOME=/Users/myuser/dataflow-p2-site
-    export DATAFLOW_VER=6.5.0.117
+    export DATAFLOW_VER=6.5.2.112
 
 
 ## Building
@@ -29,6 +21,12 @@ The update site is built using [Apache Maven 3.0.5 or later](http://maven.apache
 To build, run:
 
     mvn clean install
+    
+You can update the version number by running
+
+    mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=version
+    
+where version is of the form x.y.z or x.y.z-SNAPSHOT.
     
 
 ## Using the XPath operator with the DataFlow Engine
