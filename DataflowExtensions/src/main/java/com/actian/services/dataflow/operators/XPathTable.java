@@ -64,6 +64,20 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
     private boolean includeNodeXML = false;
     private boolean includeSourceXML = true;
     private String inputField;
+    private XPathFactory xpathfactory;
+
+    public XPathTable()
+    {
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(getClass().getClassLoader());
+        try {
+            xpathfactory = XPathFactory.newInstance();
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+    }
+
 
     @Override
     protected void execute(ExecutionContext ctx) {
@@ -71,7 +85,7 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
         RecordOutput outputRec = (RecordOutput) ctx.getOutputPort(getOutput());
 
         while (inputRec.stepNext()) {
-            javax.xml.xpath.XPath xpath = (javax.xml.xpath.XPath) XPathFactory.newInstance().newXPath();
+            javax.xml.xpath.XPath xpath = xpathfactory.newXPath();
             InputSource source = new InputSource(new StringReader(((StringInputField) inputRec.getField(inputField)).asString()));
             try {
                 NodeList nodes = (NodeList) xpath.evaluate(expression, source, XPathConstants.NODESET);

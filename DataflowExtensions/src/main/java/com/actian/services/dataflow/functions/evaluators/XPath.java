@@ -37,16 +37,26 @@ public class XPath implements FunctionEvaluator {
     private final StringSettable result;
     private final StringValued expression;
     private final StringValued value;
+    private XPathFactory xpathfactory;
 
     public XPath(StringSettable result, StringValued expression, StringValued value) {
         this.result = result;
         this.expression = expression;
         this.value = value;
+
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(getClass().getClassLoader());
+        try {
+            xpathfactory = XPathFactory.newInstance();
+        } finally {
+            t.setContextClassLoader(cl);
+        }
     }
 
     @Override
     public void evaluate() {
-        javax.xml.xpath.XPath xpath = (javax.xml.xpath.XPath) XPathFactory.newInstance().newXPath();
+        javax.xml.xpath.XPath xpath = xpathfactory.newInstance().newXPath();
         InputSource input = new InputSource(new StringReader(value.asString()));
         String output = "";
         try {

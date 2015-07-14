@@ -14,7 +14,7 @@
 <feature
       id="com.actian.services.knime.xpath.feature"
       label="Actian Services XPath Operator"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="Actian Corporation">
 
    <description>
