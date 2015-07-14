@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.actian.services.dataflow</groupId>
     <artifactId>xpath-op</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>xpath-op-dependencies</artifactId>
   <packaging>pom</packaging>
