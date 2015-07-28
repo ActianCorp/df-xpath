@@ -56,6 +56,7 @@ public class XPath implements FunctionEvaluator {
 
     @Override
     public void evaluate() {
+        // Todo -- The implementation of this function does not attempt to do namespace resolution
         javax.xml.xpath.XPath xpath = xpathfactory.newInstance().newXPath();
         InputSource input = new InputSource(new StringReader(value.asString()));
         String output = "";
