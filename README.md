@@ -4,15 +4,10 @@ The df-xpath tree is an Actian DataFlow operator for querying XML data.
 
 ## Configuration
 
-Before df-xpath tree, you need to have installed the dataflow-p2-site repository, and amended the
-dataflow.url property to point to the desktop site. (change the /ide suffix to /desktop)
-e.g. http://dataflowrepo.actian.com/latest/desktop
-
-the following environment variables are setup similar to the following.
+Before building df-xpath you need to define the following environment variables to point to the local DataFlow update site [dataflow-p2-site](https://github.com/ActianCorp/dataflow-p2-site) root directory and the DataFlow version.
 
     export DATAFLOW_REPO_HOME=/Users/myuser/dataflow-p2-site
     export DATAFLOW_VER=6.5.2.112
-
 
 ## Building
 
