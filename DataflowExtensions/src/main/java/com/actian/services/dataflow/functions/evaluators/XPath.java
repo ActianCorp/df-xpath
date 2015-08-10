@@ -20,6 +20,11 @@ import com.pervasive.datarush.tokens.scalar.StringSettable;
 import com.pervasive.datarush.tokens.scalar.StringValued;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Iterator;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -28,6 +33,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -38,6 +45,7 @@ public class XPath implements FunctionEvaluator {
     private final StringValued expression;
     private final StringValued value;
     private XPathFactory xpathfactory;
+    private DocumentBuilderFactory documentBuilderFactory;
 
     public XPath(StringSettable result, StringValued expression, StringValued value) {
         this.result = result;
@@ -49,6 +57,7 @@ public class XPath implements FunctionEvaluator {
         t.setContextClassLoader(getClass().getClassLoader());
         try {
             xpathfactory = XPathFactory.newInstance();
+            documentBuilderFactory = DocumentBuilderFactory.newInstance();
         } finally {
             t.setContextClassLoader(cl);
         }
@@ -60,8 +69,14 @@ public class XPath implements FunctionEvaluator {
         InputSource input = new InputSource(new StringReader(value.asString()));
         String output = "";
         try {
+            DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
+
+            Document dom = db.parse(input);
+
+            xpath.setNamespaceContext(new UniversalNamespaceResolver(dom));
+
             // First attempt to see if we have a list of nodes
-            NodeList nodes = (NodeList) xpath.evaluate(expression.asString(), input, XPathConstants.NODESET);
+            NodeList nodes = (NodeList) xpath.evaluate(expression.asString(), dom, XPathConstants.NODESET);
             if (nodes != null) {
                 if (nodes.getLength() == 0) {
                     output = null;
@@ -96,4 +111,33 @@ public class XPath implements FunctionEvaluator {
         return sw.toString();
     }
 
+    // The following is from the article "Using the Java language NamespaceContext object with XPath"
+    // http://www.ibm.com/developerworks/library/x-nmspccontext/
+    private final static class UniversalNamespaceResolver implements NamespaceContext {
+
+        private Document sourceDocument;
+
+        public UniversalNamespaceResolver(Document document) {
+            sourceDocument = document;
+        }
+
+        @Override
+        public String getNamespaceURI(String prefix) {
+            if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+                return sourceDocument.lookupNamespaceURI(null);
+            } else {
+                return sourceDocument.lookupNamespaceURI(prefix);
+            }
+        }
+
+        @Override
+        public String getPrefix(String namespaceURI) {
+            return sourceDocument.lookupPrefix(namespaceURI);
+        }
+
+        @Override
+        public Iterator<?> getPrefixes(String namespaceURI) {
+            return null;
+        }
+    }
 }

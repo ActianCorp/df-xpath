@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>com.actian.services.dataflow</groupId>
 		<artifactId>com.actian.services.knime.xpath</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>com.actian.services.knime.xpath.functions</artifactId>
 	<packaging>eclipse-plugin</packaging>

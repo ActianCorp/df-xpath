@@ -18,8 +18,16 @@ package com.actian.services.dataflow.operators;
 import static com.pervasive.datarush.types.TokenTypeConstant.STRING;
 import static com.pervasive.datarush.types.TokenTypeConstant.record;
 
+import java.io.IOException;
 import java.io.StringReader;
 
+import java.util.Iterator;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -27,6 +35,7 @@ import javax.xml.xpath.XPathFactory;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -48,6 +57,7 @@ import com.pervasive.datarush.tokens.scalar.StringToken;
 import com.pervasive.datarush.types.RecordTokenType;
 import com.pervasive.datarush.types.TokenTypeConstant;
 import com.pervasive.datarush.types.TypeUtil;
+import org.xml.sax.SAXException;
 
 @JsonAutoDetect(JsonMethod.NONE)
 public class XPathTable extends ExecutableOperator implements RecordPipelineOperator {
@@ -65,6 +75,7 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
     private boolean includeSourceXML = true;
     private String inputField;
     private XPathFactory xpathfactory;
+    private DocumentBuilderFactory documentBuilderFactory;
 
     public XPathTable()
     {
@@ -73,6 +84,7 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
         t.setContextClassLoader(getClass().getClassLoader());
         try {
             xpathfactory = XPathFactory.newInstance();
+            documentBuilderFactory = DocumentBuilderFactory.newInstance();
         } finally {
             t.setContextClassLoader(cl);
         }
@@ -88,7 +100,14 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
             javax.xml.xpath.XPath xpath = xpathfactory.newXPath();
             InputSource source = new InputSource(new StringReader(((StringInputField) inputRec.getField(inputField)).asString()));
             try {
-                NodeList nodes = (NodeList) xpath.evaluate(expression, source, XPathConstants.NODESET);
+                DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
+
+                Document dom = db.parse(source);
+
+                xpath.setNamespaceContext(new UniversalNamespaceResolver(dom));
+
+                NodeList nodes = (NodeList) xpath.evaluate(expression, dom, XPathConstants.NODESET);
+
                 for (int i = 0; i < nodes.getLength(); i++) {
                     // Output attribute values, and text value.
                     Node n = nodes.item(i);
@@ -104,7 +123,7 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
                             }
                         } else {
                             if (n.getNodeName().equals(fieldName)) {
-                                outputRec.getField(fieldName).set(new StringToken(n.getNodeValue()));
+                                outputRec.getField(fieldName).set(new StringToken(n.getFirstChild().getTextContent()));
                             }
                         }
                     }
@@ -130,6 +149,12 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
                 }
             } catch (XPathExpressionException ex) {
                 throw new DRException("Error executing expression.",ex);
+            } catch (ParserConfigurationException ex) {
+                throw new DRException("Error creating document builder.", ex);
+            } catch (SAXException ex) {
+                throw new DRException("Error parsing XML source.", ex);
+            } catch (IOException ex) {
+                throw new DRException("Error reading XML source.", ex);
             }
         }
 
@@ -241,5 +266,34 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
 		this.inputField = inputField;
 	}
 
-    
+    // The following is from the article "Using the Java language NamespaceContext object with XPath"
+    // http://www.ibm.com/developerworks/library/x-nmspccontext/
+    private final static class UniversalNamespaceResolver implements NamespaceContext {
+
+        private Document sourceDocument;
+
+        public UniversalNamespaceResolver(Document document) {
+            sourceDocument = document;
+        }
+
+        @Override
+        public String getNamespaceURI(String prefix) {
+            if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+                return sourceDocument.lookupNamespaceURI(null);
+            } else {
+                return sourceDocument.lookupNamespaceURI(prefix);
+            }
+        }
+
+        @Override
+        public String getPrefix(String namespaceURI) {
+            return sourceDocument.lookupPrefix(namespaceURI);
+        }
+
+        @Override
+        public Iterator<?> getPrefixes(String namespaceURI) {
+            return null;
+        }
+    }
+
 }
