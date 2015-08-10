@@ -139,19 +139,26 @@ final class XPathTableNodeDialogPane extends JPanel implements CustomDialogCompo
 				Node n = nodeList.item(i);
 				// Have we a list of nodes or scalars?
 				if (n.hasAttributes()) {
-					for(int j=0; j < n.getAttributes().getLength();j++) {
-						String attributeName = n.getAttributes().item(j).getNodeName();
+					for (int j = 0; j < n.getAttributes().getLength(); j++) {
+						String attributeName = "@"
+								+ n.getAttributes().item(j).getNodeName();
 						if (!fieldNames.contains(attributeName)) {
 							fieldNames.add(attributeName);
 							fields.add(SchemaBuilder.STRING(attributeName));
 						}
 					}
-				} else {
-					String attributeName = n.getNodeName();
-					if (!fieldNames.contains(attributeName)) {
-						fieldNames.add(attributeName);
-						fields.add(SchemaBuilder.STRING(attributeName));
+				}
+				// Add on any children with a single text element.
+				Node child = n.getFirstChild();
+				while(child != null) {
+					if (isSimpleElement(child) ) {
+						String attributeName = child.getNodeName();
+						if (!fieldNames.contains(attributeName)) {
+							fieldNames.add(attributeName);
+							fields.add(SchemaBuilder.STRING(attributeName));
+						}
 					}
+					child = child.getNextSibling();
 				}
 			}
 			settings.model.schema.setSchema(SchemaBuilder.define(fields.toArray(new SchemaField[]{})));
@@ -164,15 +171,23 @@ final class XPathTableNodeDialogPane extends JPanel implements CustomDialogCompo
 				RecordSettable setter = rtl.getTokenSetter(i);
 				for(int j=0;j<fieldNames.size();j++)
 				 {
-					if (n.hasAttributes()) {
-						Node attr = n.getAttributes().getNamedItem(fieldNames.get(j));
+					if (n.hasAttributes() && fieldNames.get(j).startsWith("@")) {
+						Node attr = n.getAttributes().getNamedItem(fieldNames.get(j).substring(1));
 						if (attr != null) {
-						setter.getField(fieldNames.get(j)).set(StringToken.parse(attr.getNodeValue()));
+						    setter.getField(fieldNames.get(j)).set(StringToken.parse(attr.getNodeValue()));
 						} else {
 							setter.getField(fieldNames.get(j)).setNull();
 						}
-					} else {
-						setter.getField(fieldNames.get(j)).set(StringToken.parse(n.getNodeValue()));
+					} else if(n.hasChildNodes()) {
+						Node child = n.getFirstChild();
+						
+						while(child != null) {
+							if (child.getNodeName().equals(fieldNames.get(j))) {
+								setter.getField(fieldNames.get(j)).set(StringToken.parse(child.getTextContent()));
+								break;
+							}
+							child = child.getNextSibling();
+						}
 					}
 				}
 			}
@@ -190,6 +205,19 @@ final class XPathTableNodeDialogPane extends JPanel implements CustomDialogCompo
 		history.add(sampleFileComboBox.getSelectedItem().toString());
 	}
 	
+	private boolean isSimpleElement(Node node) {
+		// Simple elements have child, none of which are elements.
+		boolean candidate = node.hasChildNodes()  ? true : false;
+		
+		NodeList nl = node.getChildNodes();
+		for (int i=0;i<nl.getLength();i++) {
+			if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				candidate = false;
+			}
+		}
+		return candidate;
+	}
+
 	private void initComponents() {
 		
 		JPanel xpathPanel = new JPanel();

@@ -141,17 +141,8 @@ public class XMLFunctionsTest {
     
     @Test
     public void testinvalidXPath() {
-        String validXML;
         String invalidXML;
-        
-        validXML = "<?xml version='1.0'?>"
-                + "<root><fruits>"
-                + "<fruit name='apple' color='green'/>"
-                + "<ignore>Me</ignore>"
-                + "<fruit name='cherry' color='red'/>"
-                + "</fruits>"
-                + "</root>";
-        
+
         invalidXML = "<root><fruits><fruit name='apple' color='green'></fruits></root>";
         
         RecordTokenType dataType = record(STRING("xmlDoc"));
@@ -167,7 +158,7 @@ public class XMLFunctionsTest {
         df.setDerivedFields("xpath(\"//fruits/ignore/.\",xmlDoc) as result");
        
         AssertPredicate ap = g.add(new AssertPredicate());
-        ap.setPredicate("indexOf(result,\"SAXParseException\") > 0");
+        ap.setPredicate("result == \"The end-tag for element type \\\"fruit\\\" must end with a '>' delimiter.\"");
         LogRows lr = g.add(new LogRows(1));
         g.connect(er.getOutput(), df.getInput());
         g.connect(df.getOutput(), lr.getInput());

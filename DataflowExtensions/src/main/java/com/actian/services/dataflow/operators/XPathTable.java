@@ -113,17 +113,22 @@ public class XPathTable extends ExecutableOperator implements RecordPipelineOper
                     Node n = nodes.item(i);
                     // Loop through the schema
                     for (String fieldName : schema.getFieldNames()) {
-                        if (n.hasAttributes()) {
+                    	outputRec.getField(fieldName).setNull();
+                    	
+                        if (n.hasAttributes() && fieldName.startsWith("@")) {
                             // Test for attribute with the name.
-                            Node attr = n.getAttributes().getNamedItem(fieldName);
+                            Node attr = n.getAttributes().getNamedItem(fieldName.substring(1));
                             if (attr != null) {
                                 outputRec.getField(fieldName).set(new StringToken(attr.getNodeValue()));
-                            } else {
-                                outputRec.getField(fieldName).setNull();
                             }
-                        } else {
-                            if (n.getNodeName().equals(fieldName)) {
-                                outputRec.getField(fieldName).set(new StringToken(n.getFirstChild().getTextContent()));
+                        } else if (n.hasChildNodes()){
+                            Node child = n.getFirstChild();
+                            while(child != null){
+                            	if (child.getNodeName().equals(fieldName)) {
+                            		outputRec.getField(fieldName).set(StringToken.parse(child.getTextContent()));
+                            		break;
+                            	}
+                            	child = child.getNextSibling();
                             }
                         }
                     }
