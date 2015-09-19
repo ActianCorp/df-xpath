@@ -18,9 +18,11 @@ package com.actian.services.dataflow.functions.evaluators;
 import com.pervasive.datarush.functions.FunctionEvaluator;
 import com.pervasive.datarush.tokens.scalar.StringSettable;
 import com.pervasive.datarush.tokens.scalar.StringValued;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -32,6 +34,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
@@ -76,7 +79,13 @@ public class XPath implements FunctionEvaluator {
             xpath.setNamespaceContext(new UniversalNamespaceResolver(dom));
 
             // First attempt to see if we have a list of nodes
-            NodeList nodes = (NodeList) xpath.evaluate(expression.asString(), dom, XPathConstants.NODESET);
+            NodeList nodes=null;
+            try {
+                nodes = (NodeList) xpath.evaluate(expression.asString(), dom, XPathConstants.NODESET);
+            } catch (XPathExpressionException ex) {
+                output = xpath.evaluate(expression.asString(),dom);
+            }
+            
             if (nodes != null) {
                 if (nodes.getLength() == 0) {
                     output = null;

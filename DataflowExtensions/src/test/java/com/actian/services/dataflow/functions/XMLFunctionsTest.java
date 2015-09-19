@@ -60,10 +60,11 @@ public class XMLFunctionsTest {
         df.setDropUnderivedFields(true);
         
         df.setDerivedFields("xpath(\"//fruits/ignore/text()\",xmlDoc) as result," +
-                            "xpath(\"//fruits/fruit[1]/@color\",xmlDoc) as attr" );
+                            "xpath(\"//fruits/fruit[1]/@color\",xmlDoc) as attr," +
+        		            "xpath(\"name(//fruits/fruit[1])\",xmlDoc) as name");
        
         AssertPredicate ap = g.add(new AssertPredicate());
-        ap.setPredicate("result = \"Me\" and attr = \"green\"");
+        ap.setPredicate("result = \"Me\" and attr = \"green\" and name = \"fruit\"");
         LogRows lr = g.add(new LogRows(1));
         g.connect(er.getOutput(), df.getInput());
         g.connect(df.getOutput(), lr.getInput());
